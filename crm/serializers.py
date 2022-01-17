@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Company, Cooperation, Office, Worker, Profile, UserSkill, UserLanguage
+from .models import Company, Office, Worker, Profile, UserSkill, UserLanguage
 
 
 class CompanyCreateSerializers(serializers.ModelSerializer):
@@ -17,21 +17,26 @@ class CompanyCreateSerializers(serializers.ModelSerializer):
 class CompanySerializer(serializers.ModelSerializer):
     class Meta:
         model = Company
-        fields = ('name', 'amount_offices', 'amount_workers', 'created_at', 'updated_at')
+        fields = ('id', 'name', 'amount_offices', 'created_at', 'updated_at')
 
 
 class CompanyDetailSerializer(serializers.ModelSerializer):
     offices = serializers.StringRelatedField(many=True)
-    workers = serializers.StringRelatedField(many=True)
-    get_cooperation = serializers.StringRelatedField(many=True)
 
     class Meta:
         model = Company
-        fields = ('name', 'about', 'offices', 'workers', 'created_at', 'get_cooperation')
+        fields = ('name', 'about', 'offices', 'created_at',)
 
 
-class CooperationCreateSerializer(serializers.ModelSerializer):
+class OfficeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Office
+        fields = ('name',)
+
+
+class OfficesCompanySerializer(serializers.ModelSerializer):
+    workers = serializers.StringRelatedField(many=True)
 
     class Meta:
-        model = Cooperation
-        fields = "__all__"
+        model = Office
+        fields = ('workers', 'amount_workers')

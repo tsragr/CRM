@@ -7,7 +7,7 @@ from django.utils import timezone
 class Company(models.Model):
     name = models.CharField(max_length=150)
     about = models.TextField()
-    created_at = models.DateField(default=timezone.now)
+    created_at = models.DateField(auto_now_add=True)
     updated_at = models.DateField(auto_now=True)
     is_active = models.BooleanField(default=False)
 
@@ -15,44 +15,29 @@ class Company(models.Model):
     def amount_offices(self):
         return self.offices.count()
 
-    @property
-    def amount_workers(self):
-        return self.workers.count()
-
     def __str__(self):
         return f'{self.name}'
-
-    @property
-    def get_cooperation(self):
-        try:
-            return self.cooperation.first().cooperation_companies.all()
-        except AttributeError:
-            pass
-
-
-class Cooperation(models.Model):
-    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='cooperation')
-    cooperation_companies = models.ManyToManyField(Company, related_name='cooperation_companies')
-
-    def __str__(self):
-        return f'{self.company.name}'
 
 
 class Office(models.Model):
     name = models.CharField(max_length=150)
-    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='offices')
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='offices', blank=True, null=True)
     location = CountryField()
-    created_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    is_active = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return f'{self.name} company - {self.company.name}'
 
+    @property
+    def amount_workers(self):
+        return self.workers.count()
+
 
 class Worker(models.Model):
-    employer = models.ForeignKey('Profile', on_delete=models.CASCADE, )
-    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='workers')
+    employer = models.ForeignKey('Profile', on_delete=models.CASCADE)
+    company = models.ForeignKey(Office, on_delete=models.CASCADE, related_name='workers')
     position = models.CharField(max_length=150)
 
     def __str__(self):
@@ -66,7 +51,7 @@ class Profile(models.Model):
     patronymic = models.CharField(max_length=150, null=True)
     bio = models.TextField()
     is_active = models.BooleanField(default=False)
-    created_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
