@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django_countries.fields import CountryField
 from django.utils import timezone
+from django.shortcuts import reverse
 
 
 class Company(models.Model):
@@ -36,12 +37,12 @@ class Office(models.Model):
 
 
 class Worker(models.Model):
-    employer = models.ForeignKey('Profile', on_delete=models.CASCADE)
-    company = models.ForeignKey(Office, on_delete=models.CASCADE, related_name='workers')
+    employer = models.OneToOneField('Profile', on_delete=models.CASCADE, related_name='work')
+    office = models.ForeignKey(Office, on_delete=models.CASCADE, related_name='workers')
     position = models.CharField(max_length=150)
 
     def __str__(self):
-        return f'{self.employer.name} company - {self.company.name}, position is {self.position}'
+        return f'{self.employer.name} office - {self.office.name}, position is {self.position}'
 
 
 class Profile(models.Model):

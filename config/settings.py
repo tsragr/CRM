@@ -1,21 +1,16 @@
-
-
 from pathlib import Path
+from dotenv import load_dotenv
+import os
 
+load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-
-
-SECRET_KEY = 'django-insecure-lai(!u2(s8i8((u3*^pf$jc7r#$4hja$@$0k*sl8h1d%j0dqg2'
-
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
-
-
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -65,20 +60,16 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'crm_db',
+        'NAME': os.getenv('NAME'),
         'USER': 'maxim',
-        'PASSWORD': '123qwe',
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
+        'PASSWORD': os.getenv('PASSWORD'),
+        'HOST': os.getenv('HOST'),
+        'PORT': os.getenv('PORT'),
     }
 }
-
-
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -95,8 +86,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
-
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
@@ -107,11 +96,7 @@ USE_L10N = True
 
 USE_TZ = True
 
-
-
 STATIC_URL = '/static/'
-
-
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

@@ -8,11 +8,6 @@ class CompanyCreateSerializers(serializers.ModelSerializer):
         model = Company
         fields = ('name', 'about', 'is_active', 'created_at')
 
-    def create(self, validated_data):
-        company = Company.objects.create(**validated_data)
-        Cooperation.objects.create(company=company)
-        return company
-
 
 class CompanySerializer(serializers.ModelSerializer):
     class Meta:
@@ -21,7 +16,7 @@ class CompanySerializer(serializers.ModelSerializer):
 
 
 class CompanyDetailSerializer(serializers.ModelSerializer):
-    offices = serializers.StringRelatedField(many=True)
+    offices = serializers.SlugRelatedField(many=True, slug_field='name', read_only=True)
 
     class Meta:
         model = Company
@@ -29,14 +24,48 @@ class CompanyDetailSerializer(serializers.ModelSerializer):
 
 
 class OfficeSerializer(serializers.ModelSerializer):
+    location = serializers.SerializerMethodField()
+    company = serializers.SlugRelatedField(slug_field='name', read_only=True)
+
+    url_company = serializers.HyperlinkedRelatedField(source='company', view_name='company-detail',
+                                                      read_only=True)
+
     class Meta:
         model = Office
-        fields = ('name',)
+        fields = ('name', 'location', 'created_at', 'updated_at', 'company', 'url_company')
+
+    def get_location(self, obj):
+        return obj.location.name
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = ('name', 'surname', 'patronymic')
+
+
+class WorkersSerializer(serializers.ModelSerializer):
+    worker_info = ProfileSerializer(source='employer', read_only=True)
+
+    class Meta:
+        model = Worker
+        fields = ['id', 'worker_info', 'position']
+        read_only = True
 
 
 class OfficesCompanySerializer(serializers.ModelSerializer):
-    workers = serializers.StringRelatedField(many=True)
+    workers = WorkersSerializer(many=True, )
+    location = serializers.SerializerMethodField()
 
     class Meta:
         model = Office
-        fields = ('workers', 'amount_workers')
+        fields = ('name', 'workers', 'amount_workers', 'location')
+
+    def get_location(self, obj):
+        return obj.location.name
+
+
+class CreateOfficeCompanySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Office
+        fields = ('name', 'location')
