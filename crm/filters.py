@@ -4,8 +4,9 @@ from django_filters import rest_framework as filters
 
 
 class CompanyFilter(django_filters.FilterSet):
-    offices__lte = django_filters.NumberFilter(lookup_expr='lte')
-    offices__gte = django_filters.NumberFilter(lookup_expr='gte')
+    offices__count = django_filters.NumberFilter()
+    offices__count__gte = django_filters.NumberFilter(field_name='offices__count', lookup_expr='gt')
+    offices__count__lte = django_filters.NumberFilter(field_name='offices__count', lookup_expr='lt')
 
     class Meta:
         model = Company

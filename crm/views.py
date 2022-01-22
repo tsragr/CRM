@@ -9,12 +9,13 @@ from .filters import CompanyFilter, OfficeFilter
 from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from django.db.models import Count
 
 
 class CompanyViewSet(viewsets.GenericViewSet,
                      mixins.ListModelMixin,
                      mixins.CreateModelMixin):
-    queryset = Company.objects.filter(is_active=True)
+    queryset = Company.objects.alias(Count('offices')).filter(is_active=True)
     filter_backends = [DjangoFilterBackend]
     filterset_class = CompanyFilter
     serializers = {'list': CompanySerializer,
